@@ -14,7 +14,7 @@ if (!getApps().length) {
     credential: cert({
       projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
     }),
   })
 }
@@ -22,18 +22,18 @@ if (!getApps().length) {
 export async function POST(request: NextRequest) {
   try {
     // Verificar autenticação
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Token de autenticação necessário' }, { status: 401 })
+    const authHeader = request.headers.get("authorization")
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Token de autenticação necessário" }, { status: 401 })
     }
 
-    const token = authHeader.split('Bearer ')[1]
+    const token = authHeader.split("Bearer ")[1]
     let decodedToken
-    
+
     try {
       decodedToken = await auth().verifyIdToken(token)
     } catch (error) {
-      return NextResponse.json({ error: 'Token inválido' }, { status: 401 })
+      return NextResponse.json({ error: "Token inválido" }, { status: 401 })
     }
 
     const userId = decodedToken.uid
@@ -125,9 +125,9 @@ Seja específico sobre as competências e dê exemplos concretos de melhoria.`,
     let chatHistory = conversationHistory
     if (!chatHistory || !Array.isArray(chatHistory)) {
       const firebaseHistory = await loadChatHistory(userId, subject, 10)
-      chatHistory = firebaseHistory.map(msg => ({
+      chatHistory = firebaseHistory.map((msg) => ({
         role: msg.sender === "user" ? "user" : "assistant",
-        content: msg.text
+        content: msg.text,
       }))
     }
 
@@ -151,7 +151,8 @@ Seja específico sobre as competências e dê exemplos concretos de melhoria.`,
       frequency_penalty: 0.1,
     })
 
-    const response = completion.choices[0]?.message?.content || "Desculpe, não consegui gerar uma resposta."
+    const response =
+      completion.choices[0]?.message?.content || "Desculpe, não consegui gerar uma resposta."
 
     // Salvar resposta da IA no Firebase
     await saveChatMessage(userId, subject, response, "bot")

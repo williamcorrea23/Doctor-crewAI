@@ -17,9 +17,10 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: "EduENEM - Plataforma de Estudos",
-  description: "Plataforma completa para preparação do ENEM com IA",
+  title: "ENEM WISE - Plataforma Inteligente de Estudos",
+  description: "Plataforma completa para preparação do ENEM com Inteligência Artificial",
   generator: "v0.dev",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 }
 
 export default function RootLayout({

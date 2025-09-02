@@ -1,0 +1,68 @@
+name: Auto Sync
+
+on:
+  schedule:
+    # Executa a cada 30 minutos
+    - cron: "*/30 * * * *"
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  auto-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format code
+        run: |
+          npm run format --if-present || echo "No format script found"
+
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "🤖 Auto-sync: Format code and update dependencies"
+          git push
+
+      - name: Create PR for major changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "🤖 Auto-sync: Automated updates"
+          title: "🤖 Automated Updates"
+          body: |
+            ## 🤖 Automated Updates
+
+            This PR contains automated updates:
+            - Code formatting
+            - Dependency updates
+            - Configuration changes
+
+            Please review before merging.
+          branch: auto-sync/updates
+          delete-branch: true

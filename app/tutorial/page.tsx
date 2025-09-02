@@ -61,7 +61,8 @@ const tutorialSections = [
     steps: [
       {
         title: "Escolha a matéria",
-        description: "Selecione entre Matemática, Linguagens, Ciências Humanas, Ciências da Natureza ou Redação",
+        description:
+          "Selecione entre Matemática, Linguagens, Ciências Humanas, Ciências da Natureza ou Redação",
         tip: "Cada matéria tem uma IA especializada com conhecimento específico",
       },
       {
@@ -207,14 +208,18 @@ export default function Tutorial() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 pb-20">
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
+      <div className="container mx-auto max-w-4xl px-4 py-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Tutorial da Plataforma</h1>
-          <p className="text-gray-600">Aprenda a usar todas as funcionalidades e maximize seus estudos para o ENEM</p>
+          <h1 className="mb-2 font-serif text-3xl font-bold text-gray-900">
+            Tutorial da Plataforma
+          </h1>
+          <p className="text-gray-600">
+            Aprenda a usar todas as funcionalidades e maximize seus estudos para o ENEM
+          </p>
         </div>
 
         {/* Quick Start Guide */}
-        <Card className="mb-8 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="mb-8 border-0 bg-white/90 shadow-lg backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-amber-600" />
@@ -222,33 +227,33 @@ export default function Tutorial() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-4 gap-4">
+            <div className="grid gap-4 md:grid-cols-4">
               <div className="text-center">
-                <div className="p-3 bg-blue-100 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 p-3">
                   <Users className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">1. Faça Login</h3>
+                <h3 className="mb-1 font-semibold text-gray-900">1. Faça Login</h3>
                 <p className="text-sm text-gray-600">Entre com sua conta</p>
               </div>
               <div className="text-center">
-                <div className="p-3 bg-green-100 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 p-3">
                   <MessageCircle className="h-6 w-6 text-green-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">2. Tire Dúvidas</h3>
+                <h3 className="mb-1 font-semibold text-gray-900">2. Tire Dúvidas</h3>
                 <p className="text-sm text-gray-600">Use o chat com IA</p>
               </div>
               <div className="text-center">
-                <div className="p-3 bg-red-100 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 p-3">
                   <PenTool className="h-6 w-6 text-red-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">3. Escreva Redações</h3>
+                <h3 className="mb-1 font-semibold text-gray-900">3. Escreva Redações</h3>
                 <p className="text-sm text-gray-600">Receba feedback detalhado</p>
               </div>
               <div className="text-center">
-                <div className="p-3 bg-purple-100 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 p-3">
                   <Target className="h-6 w-6 text-purple-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">4. Pratique</h3>
+                <h3 className="mb-1 font-semibold text-gray-900">4. Pratique</h3>
                 <p className="text-sm text-gray-600">Resolva exercícios</p>
               </div>
             </div>
@@ -256,21 +261,24 @@ export default function Tutorial() {
         </Card>
 
         {/* Detailed Tutorials */}
-        <div className="space-y-4 mb-8">
-          <h2 className="text-2xl font-serif font-bold text-gray-900">Tutoriais Detalhados</h2>
+        <div className="mb-8 space-y-4">
+          <h2 className="font-serif text-2xl font-bold text-gray-900">Tutoriais Detalhados</h2>
           {tutorialSections.map((section) => (
-            <Card key={section.id} className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-              <Collapsible open={activeSection === section.id} onOpenChange={() => toggleSection(section.id)}>
+            <Card key={section.id} className="border-0 bg-white/90 shadow-lg backdrop-blur-sm">
+              <Collapsible
+                open={activeSection === section.id}
+                onOpenChange={() => toggleSection(section.id)}
+              >
                 <CollapsibleTrigger asChild>
-                  <CardHeader className="cursor-pointer hover:bg-gray-50/50 transition-colors">
+                  <CardHeader className="cursor-pointer transition-colors hover:bg-gray-50/50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-lg ${section.color}`}>
+                        <div className={`rounded-lg p-3 ${section.color}`}>
                           <section.icon className="h-6 w-6" />
                         </div>
                         <div>
                           <CardTitle className="text-lg">{section.title}</CardTitle>
-                          <p className="text-sm text-gray-600 font-normal">{section.description}</p>
+                          <p className="text-sm font-normal text-gray-600">{section.description}</p>
                         </div>
                       </div>
                       {activeSection === section.id ? (
@@ -289,20 +297,22 @@ export default function Tutorial() {
                         const isCompleted = completedSteps.has(stepId)
 
                         return (
-                          <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-lg">
+                          <div key={index} className="flex gap-4 rounded-lg bg-gray-50 p-4">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => markStepCompleted(section.id, index)}
-                              className={`p-1 h-6 w-6 rounded-full ${
-                                isCompleted ? "bg-green-100 text-green-600" : "bg-gray-200 text-gray-400"
+                              className={`h-6 w-6 rounded-full p-1 ${
+                                isCompleted
+                                  ? "bg-green-100 text-green-600"
+                                  : "bg-gray-200 text-gray-400"
                               }`}
                             >
                               <CheckCircle className="h-4 w-4" />
                             </Button>
                             <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
-                              <p className="text-gray-700 mb-2">{step.description}</p>
+                              <h4 className="mb-1 font-semibold text-gray-900">{step.title}</h4>
+                              <p className="mb-2 text-gray-700">{step.description}</p>
                               <div className="flex items-center gap-2">
                                 <Lightbulb className="h-4 w-4 text-amber-500" />
                                 <p className="text-sm text-amber-700 italic">{step.tip}</p>
@@ -320,7 +330,7 @@ export default function Tutorial() {
         </div>
 
         {/* Study Tips */}
-        <Card className="mb-8 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="mb-8 border-0 bg-white/90 shadow-lg backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-600" />
@@ -328,17 +338,17 @@ export default function Tutorial() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6 md:grid-cols-2">
               {studyTips.map((tip, index) => (
                 <div key={index} className="flex gap-4">
-                  <div className="p-2 bg-yellow-100 rounded-lg flex-shrink-0">
+                  <div className="flex-shrink-0 rounded-lg bg-yellow-100 p-2">
                     <tip.icon className="h-5 w-5 text-yellow-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{tip.title}</h3>
-                    <p className="text-gray-700 text-sm mb-2">{tip.description}</p>
+                    <h3 className="mb-1 font-semibold text-gray-900">{tip.title}</h3>
+                    <p className="mb-2 text-sm text-gray-700">{tip.description}</p>
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                      <div className="h-2 w-2 rounded-full bg-yellow-400"></div>
                       <p className="text-xs text-yellow-700 italic">{tip.tip}</p>
                     </div>
                   </div>
@@ -349,7 +359,7 @@ export default function Tutorial() {
         </Card>
 
         {/* FAQ */}
-        <Card className="mb-8 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="mb-8 border-0 bg-white/90 shadow-lg backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HelpCircle className="h-5 w-5 text-blue-600" />
@@ -360,9 +370,15 @@ export default function Tutorial() {
             <div className="space-y-4">
               {faqItems.map((faq, index) => (
                 <div key={index}>
-                  <Collapsible open={openFaq === `faq-${index}`} onOpenChange={() => toggleFaq(`faq-${index}`)}>
+                  <Collapsible
+                    open={openFaq === `faq-${index}`}
+                    onOpenChange={() => toggleFaq(`faq-${index}`)}
+                  >
                     <CollapsibleTrigger asChild>
-                      <Button variant="ghost" className="w-full justify-between p-4 h-auto text-left hover:bg-gray-50">
+                      <Button
+                        variant="ghost"
+                        className="h-auto w-full justify-between p-4 text-left hover:bg-gray-50"
+                      >
                         <span className="font-medium text-gray-900">{faq.question}</span>
                         {openFaq === `faq-${index}` ? (
                           <ChevronDown className="h-4 w-4 text-gray-500" />
@@ -373,7 +389,7 @@ export default function Tutorial() {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="px-4 pb-4">
-                        <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                        <p className="leading-relaxed text-gray-700">{faq.answer}</p>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -385,22 +401,24 @@ export default function Tutorial() {
         </Card>
 
         {/* Call to Action */}
-        <Card className="shadow-lg border-0 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <Card className="border-0 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-lg">
           <CardContent className="p-8 text-center">
-            <div className="p-4 bg-blue-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 p-4">
               <Award className="h-8 w-8 text-blue-600" />
             </div>
-            <h3 className="text-xl font-serif font-bold text-gray-900 mb-2">Pronto para começar?</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="mb-2 font-serif text-xl font-bold text-gray-900">
+              Pronto para começar?
+            </h3>
+            <p className="mb-6 text-gray-600">
               Agora que você conhece todas as funcionalidades, comece sua jornada rumo ao ENEM!
             </p>
-            <div className="flex gap-4 justify-center">
+            <div className="flex justify-center gap-4">
               <Button className="bg-blue-600 hover:bg-blue-700">
-                <TrendingUp className="h-4 w-4 mr-2" />
+                <TrendingUp className="mr-2 h-4 w-4" />
                 Ver Dashboard
               </Button>
               <Button variant="outline" className="bg-white">
-                <MessageCircle className="h-4 w-4 mr-2" />
+                <MessageCircle className="mr-2 h-4 w-4" />
                 Começar Aulas
               </Button>
             </div>
@@ -408,7 +426,7 @@ export default function Tutorial() {
         </Card>
 
         {/* Progress Indicator */}
-        <Card className="mt-6 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="mt-6 border-0 bg-white/90 shadow-lg backdrop-blur-sm">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -418,10 +436,11 @@ export default function Tutorial() {
                   {tutorialSections.reduce((acc, section) => acc + section.steps.length, 0)} passos
                 </span>
               </div>
-              <Badge variant="outline" className="text-green-700 border-green-300">
+              <Badge variant="outline" className="border-green-300 text-green-700">
                 {Math.round(
-                  (completedSteps.size / tutorialSections.reduce((acc, section) => acc + section.steps.length, 0)) *
-                    100,
+                  (completedSteps.size /
+                    tutorialSections.reduce((acc, section) => acc + section.steps.length, 0)) *
+                    100
                 )}
                 % completo
               </Badge>

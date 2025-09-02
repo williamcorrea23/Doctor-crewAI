@@ -22,8 +22,8 @@ export function BottomNavigation({ currentPage }: BottomNavigationProps) {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50">
-      <div className="flex justify-around items-center max-w-md mx-auto">
+    <nav className="safe-area-pb fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white/95 px-2 py-2 backdrop-blur-sm sm:px-4">
+      <div className="mx-auto flex max-w-lg items-center justify-around">
         {navItems.map(({ href, icon: Icon, label, id }) => {
           const isActive = currentPage === id || pathname === href
 
@@ -31,22 +31,28 @@ export function BottomNavigation({ currentPage }: BottomNavigationProps) {
             <Link
               key={id}
               href={href}
-              className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
-                isActive ? "text-blue-600 bg-blue-50" : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+              className={`flex min-w-0 flex-col items-center gap-0.5 rounded-lg p-1.5 transition-colors sm:gap-1 sm:p-2 ${
+                isActive
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-600 hover:bg-blue-50 hover:text-blue-600"
               }`}
             >
-              <Icon className="h-5 w-5" />
-              <span className="text-xs font-medium">{label}</span>
+              <Icon className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+              <span className="max-w-[60px] truncate text-[10px] font-medium sm:max-w-none sm:text-xs">
+                {label}
+              </span>
             </Link>
           )
         })}
 
         <button
           onClick={logout}
-          className="flex flex-col items-center gap-1 p-2 rounded-lg transition-colors text-red-600 hover:text-red-700 hover:bg-red-50"
+          className="flex min-w-0 flex-col items-center gap-0.5 rounded-lg p-1.5 text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 sm:gap-1 sm:p-2"
         >
-          <LogOut className="h-5 w-5" />
-          <span className="text-xs font-medium">Sair</span>
+          <LogOut className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+          <span className="max-w-[60px] truncate text-[10px] font-medium sm:max-w-none sm:text-xs">
+            Sair
+          </span>
         </button>
       </div>
     </nav>

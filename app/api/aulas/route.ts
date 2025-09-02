@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
-import { auth } from 'firebase-admin';
-import { saveChatMessage, loadChatHistory } from '@/lib/chat-history';
+import { NextRequest, NextResponse } from "next/server"
+import OpenAI from "openai"
+import { auth } from "firebase-admin"
+import { saveChatMessage, loadChatHistory } from "@/lib/chat-history"
 
 // Initialize Firebase Admin
 if (!process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PRIVATE_KEY) {
-  console.warn('Firebase Admin credentials not configured');
+  console.warn("Firebase Admin credentials not configured")
 }
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+})
 
 // Prompt baseado na pedagogia de Paulo Freire
 const PAULO_FREIRE_PROMPT = `
@@ -35,97 +35,85 @@ Sua linguagem deve ser:
 - Conectada com a realidade do estudante
 
 Lembre-se: "Ninguém educa ninguém, ninguém educa a si mesmo, os homens se educam entre si, mediatizados pelo mundo" - Paulo Freire
-`;
+`
 
 export async function POST(request: NextRequest) {
   try {
     // Verificar autenticação
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Token de autenticação necessário' },
-        { status: 401 }
-      );
+    const authHeader = request.headers.get("authorization")
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Token de autenticação necessário" }, { status: 401 })
     }
 
-    const token = authHeader.split('Bearer ')[1];
-    let userId: string;
+    const token = authHeader.split("Bearer ")[1]
+    let userId: string
 
     try {
-      const decodedToken = await auth().verifyIdToken(token);
-      userId = decodedToken.uid;
+      const decodedToken = await auth().verifyIdToken(token)
+      userId = decodedToken.uid
     } catch (error) {
-      return NextResponse.json(
-        { error: 'Token inválido' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Token inválido" }, { status: 401 })
     }
 
-    const { message, subject } = await request.json();
+    const { message, subject } = await request.json()
 
     if (!message || !subject) {
-      return NextResponse.json(
-        { error: 'Mensagem e matéria são obrigatórias' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Mensagem e matéria são obrigatórias" }, { status: 400 })
     }
 
     // Carregar histórico da conversa
-    const conversationHistory = await loadChatHistory(userId, `aulas_${subject}`);
+    const conversationHistory = await loadChatHistory(userId, `aulas_${subject}`)
 
     // Preparar mensagens para OpenAI
     const messages: any[] = [
       {
-        role: 'system',
+        role: "system",
         content: `${PAULO_FREIRE_PROMPT}
 
 Você está ensinando sobre: ${subject}
 
-Mantenha sempre o foco na matéria solicitada, mas conecte com outras áreas do conhecimento quando relevante para o ENEM.`
-      }
-    ];
+Mantenha sempre o foco na matéria solicitada, mas conecte com outras áreas do conhecimento quando relevante para o ENEM.`,
+      },
+    ]
 
     // Adicionar histórico da conversa
-    conversationHistory.forEach(msg => {
+    conversationHistory.forEach((msg) => {
       messages.push({
-        role: msg.sender === 'user' ? 'user' : 'assistant',
-        content: msg.message
-      });
-    });
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.message,
+      })
+    })
 
     // Adicionar mensagem atual
     messages.push({
-      role: 'user',
-      content: message
-    });
+      role: "user",
+      content: message,
+    })
 
     // Salvar mensagem do usuário no histórico
-    await saveChatMessage(userId, `aulas_${subject}`, message, 'user');
+    await saveChatMessage(userId, `aulas_${subject}`, message, "user")
 
     // Chamar OpenAI
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: "gpt-4o-mini",
       messages,
       max_tokens: 1000,
       temperature: 0.7,
-    });
+    })
 
-    const aiResponse = completion.choices[0]?.message?.content || 'Desculpe, não consegui processar sua pergunta.';
-    
+    const aiResponse =
+      completion.choices[0]?.message?.content || "Desculpe, não consegui processar sua pergunta."
+
     // Salvar resposta da IA no histórico
-     await saveChatMessage(userId, `aulas_${subject}`, aiResponse, 'bot');
+    await saveChatMessage(userId, `aulas_${subject}`, aiResponse, "bot")
 
     return NextResponse.json({
       message: aiResponse,
       userId,
-      subject
-    });
-
+      subject,
+    })
   } catch (error) {
-    console.error('Erro na API de aulas:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
+    console.error("Erro na API de aulas:", error)
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

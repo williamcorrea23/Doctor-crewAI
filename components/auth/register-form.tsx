@@ -59,9 +59,9 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="mx-auto w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <CardTitle className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-2xl font-bold text-transparent">
           Criar Conta
         </CardTitle>
         <CardDescription>Crie sua conta para começar a estudar</CardDescription>
@@ -69,12 +69,12 @@ export function RegisterForm() {
       <CardContent className="space-y-4">
         {message && (
           <div
-            className={`p-3 rounded-lg text-sm ${
+            className={`rounded-lg p-3 text-sm ${
               messageType === "success"
-                ? "bg-green-100 text-green-700 border border-green-200"
+                ? "border border-green-200 bg-green-100 text-green-700"
                 : messageType === "error"
-                  ? "bg-red-100 text-red-700 border border-red-200"
-                  : "bg-blue-100 text-blue-700 border border-blue-200"
+                  ? "border border-red-200 bg-red-100 text-red-700"
+                  : "border border-blue-200 bg-blue-100 text-blue-700"
             }`}
           >
             {message}
@@ -84,7 +84,7 @@ export function RegisterForm() {
         <form onSubmit={handleRegister} className="space-y-4">
           <div className="grid grid-cols-2 gap-2">
             <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <User className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
                 placeholder="Nome"
@@ -95,7 +95,7 @@ export function RegisterForm() {
               />
             </div>
             <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <User className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
                 placeholder="Sobrenome"
@@ -108,7 +108,7 @@ export function RegisterForm() {
           </div>
 
           <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Mail className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
             <Input
               type="email"
               placeholder="Email"
@@ -120,20 +120,20 @@ export function RegisterForm() {
           </div>
 
           <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Lock className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Senha (mín. 6 caracteres)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-10"
+              className="pr-10 pl-10"
               minLength={6}
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -149,7 +149,7 @@ export function RegisterForm() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Ou</span>
+            <span className="bg-background text-muted-foreground px-2">Ou</span>
           </div>
         </div>
 

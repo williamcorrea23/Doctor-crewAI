@@ -80,9 +80,9 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="mx-auto w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <CardTitle className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-2xl font-bold text-transparent">
           Entrar
         </CardTitle>
         <CardDescription>Acesse sua conta para continuar estudando</CardDescription>
@@ -90,24 +90,24 @@ export function LoginForm() {
       <CardContent className="space-y-4">
         {message && (
           <div
-            className={`p-3 rounded-lg text-sm ${
+            className={`rounded-lg p-3 text-sm ${
               messageType === "success"
-                ? "bg-green-100 text-green-700 border border-green-200"
+                ? "border border-green-200 bg-green-100 text-green-700"
                 : messageType === "error"
-                  ? "bg-red-100 text-red-700 border border-red-200"
-                  : "bg-blue-100 text-blue-700 border border-blue-200"
+                  ? "border border-red-200 bg-red-100 text-red-700"
+                  : "border border-blue-200 bg-blue-100 text-blue-700"
             }`}
           >
             {message}
           </div>
         )}
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-          <p className="text-sm text-yellow-800 mb-2">🧪 Modo de Teste</p>
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3">
+          <p className="mb-2 text-sm text-yellow-800">🧪 Modo de Teste</p>
           <Button
             type="button"
             variant="outline"
-            className="w-full bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200"
+            className="w-full border-yellow-300 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
             onClick={handleMockLogin}
             disabled={loading}
           >
@@ -121,13 +121,13 @@ export function LoginForm() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Ou use sua conta</span>
+            <span className="bg-background text-muted-foreground px-2">Ou use sua conta</span>
           </div>
         </div>
 
         <form onSubmit={handleEmailLogin} className="space-y-4">
           <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Mail className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
             <Input
               type="email"
               placeholder="Email"
@@ -139,19 +139,19 @@ export function LoginForm() {
           </div>
 
           <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Lock className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-10"
+              className="pr-10 pl-10"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -194,7 +194,7 @@ export function LoginForm() {
           <button
             type="button"
             onClick={handleResetPassword}
-            className="text-sm text-blue-600 hover:text-blue-800 underline"
+            className="text-sm text-blue-600 underline hover:text-blue-800"
           >
             Esqueceu sua senha?
           </button>

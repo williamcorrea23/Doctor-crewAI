@@ -9,7 +9,6 @@ import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { useAuth } from "@/components/auth-provider"
 
-
 interface Essay {
   id: number
   title: string
@@ -24,7 +23,7 @@ interface RecentEssaysProps {
 }
 
 export function RecentEssays({ userId }: RecentEssaysProps) {
-  const { } = useAuth()
+  const {} = useAuth()
   const [essays, setEssays] = useState<Essay[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedEssay, setExpandedEssay] = useState<number | null>(null)
@@ -106,11 +105,11 @@ export function RecentEssays({ userId }: RecentEssaysProps) {
           <Card key={i} className="border border-gray-200">
             <CardContent className="p-4">
               <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded mb-3"></div>
+                <div className="mb-2 h-4 rounded bg-gray-200"></div>
+                <div className="mb-3 h-3 rounded bg-gray-200"></div>
                 <div className="flex gap-2">
-                  <div className="h-8 w-20 bg-gray-200 rounded"></div>
-                  <div className="h-8 w-24 bg-gray-200 rounded"></div>
+                  <div className="h-8 w-20 rounded bg-gray-200"></div>
+                  <div className="h-8 w-24 rounded bg-gray-200"></div>
                 </div>
               </div>
             </CardContent>
@@ -122,8 +121,8 @@ export function RecentEssays({ userId }: RecentEssaysProps) {
 
   if (essays.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500 mb-4">Você ainda não fez nenhuma redação.</p>
+      <div className="py-8 text-center">
+        <p className="mb-4 text-gray-500">Você ainda não fez nenhuma redação.</p>
         <Button className="bg-red-600 hover:bg-red-700">Fazer Primeira Redação</Button>
       </div>
     )
@@ -134,7 +133,7 @@ export function RecentEssays({ userId }: RecentEssaysProps) {
       {essays.map((essay) => (
         <Card key={essay.id} className="border border-gray-200">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <h4 className="font-medium text-gray-900">{essay.title}</h4>
                 <Badge className={getScoreColor(essay.score)}>
@@ -146,14 +145,16 @@ export function RecentEssays({ userId }: RecentEssaysProps) {
 
             <div className="mb-3">
               <p className="text-sm text-gray-600">
-                {expandedEssay === essay.id ? essay.feedback : `${essay.feedback.substring(0, 100)}...`}
+                {expandedEssay === essay.id
+                  ? essay.feedback
+                  : `${essay.feedback.substring(0, 100)}...`}
               </p>
             </div>
 
             {viewingEssay === essay.id && essay.userText && (
-              <div className="mb-3 p-3 bg-gray-50 rounded-lg">
-                <h5 className="font-medium text-gray-900 mb-2">Texto da Redação:</h5>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{essay.userText}</p>
+              <div className="mb-3 rounded-lg bg-gray-50 p-3">
+                <h5 className="mb-2 font-medium text-gray-900">Texto da Redação:</h5>
+                <p className="text-sm whitespace-pre-wrap text-gray-700">{essay.userText}</p>
               </div>
             )}
 

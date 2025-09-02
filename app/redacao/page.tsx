@@ -7,7 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Loader2 } from "lucide-react"
@@ -35,18 +41,33 @@ import { useAuth } from "@/components/auth-provider"
 
 const enemTopics = [
   { value: "2023", label: "2023 - O desafio de aumentar a doação de órgãos no Brasil" },
-  { value: "2022", label: "2022 - Desafios para a valorização de comunidades e povos tradicionais no Brasil" },
-  { value: "2021", label: "2021 - Invisibilidade e registro civil: garantia de acesso à cidadania no Brasil" },
+  {
+    value: "2022",
+    label: "2022 - Desafios para a valorização de comunidades e povos tradicionais no Brasil",
+  },
+  {
+    value: "2021",
+    label: "2021 - Invisibilidade e registro civil: garantia de acesso à cidadania no Brasil",
+  },
   { value: "2020", label: "2020 - O estigma associado às doenças mentais na sociedade brasileira" },
   { value: "2019", label: "2019 - Democratização do acesso ao cinema no Brasil" },
-  { value: "2018", label: "2018 - Manipulação do comportamento do usuário pelo controle de dados na internet" },
+  {
+    value: "2018",
+    label: "2018 - Manipulação do comportamento do usuário pelo controle de dados na internet",
+  },
   { value: "2017", label: "2017 - Desafios para a formação educacional de surdos no Brasil" },
   { value: "2016", label: "2016 - Caminhos para combater a intolerância religiosa no Brasil" },
-  { value: "2015", label: "2015 - A persistência da violência contra a mulher na sociedade brasileira" },
+  {
+    value: "2015",
+    label: "2015 - A persistência da violência contra a mulher na sociedade brasileira",
+  },
   { value: "2014", label: "2014 - Publicidade infantil em questão no Brasil" },
   { value: "2013", label: "2013 - Efeitos da implantação da Lei Seca no Brasil" },
   { value: "2012", label: "2012 - O movimento imigratório para o Brasil no século XXI" },
-  { value: "2011", label: "2011 - Viver em rede no século XXI: os limites entre o público e o privado" },
+  {
+    value: "2011",
+    label: "2011 - Viver em rede no século XXI: os limites entre o público e o privado",
+  },
   { value: "2010", label: "2010 - O trabalho na construção da dignidade humana" },
   { value: "2009", label: "2009 - O indivíduo frente à ética nacional" },
 ]
@@ -131,7 +152,9 @@ export default function Redacao() {
 
     try {
       const currentTopic =
-        customTopic || enemTopics.find((t) => t.value === selectedTopic)?.label || "Tema não especificado"
+        customTopic ||
+        enemTopics.find((t) => t.value === selectedTopic)?.label ||
+        "Tema não especificado"
 
       const response = await fetch("/api/redacao/avaliar", {
         method: "POST",
@@ -176,7 +199,8 @@ export default function Redacao() {
         },
         competencia4: {
           score: Math.floor(Math.random() * 40) + 140, // 140-180
-          feedback: "Articula bem as partes do texto e apresenta repertório diversificado de recursos coesivos.",
+          feedback:
+            "Articula bem as partes do texto e apresenta repertório diversificado de recursos coesivos.",
           title: "Conhecimento dos mecanismos linguísticos",
         },
         competencia5: {
@@ -229,21 +253,21 @@ export default function Redacao() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 pb-20">
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
+      <div className="container mx-auto max-w-4xl px-4 py-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Redação ENEM</h1>
+          <h1 className="mb-2 font-serif text-3xl font-bold text-gray-900">Redação ENEM</h1>
           <p className="text-gray-600">
             Pratique sua escrita com temas do ENEM e receba feedback detalhado por competência
           </p>
           {user && (
-            <p className="text-sm text-red-600 mt-2">
+            <p className="mt-2 text-sm text-red-600">
               Olá, {user.displayName || "estudante"}! Suas redações são salvas automaticamente.
             </p>
           )}
         </div>
 
         {/* Instructions */}
-        <Card className="mb-6 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="mb-6 border-0 bg-white/90 shadow-lg backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
@@ -255,52 +279,56 @@ export default function Redacao() {
                 onClick={() => setShowInstructions(!showInstructions)}
                 className="flex items-center gap-2"
               >
-                {showInstructions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {showInstructions ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
                 {showInstructions ? "Ocultar" : "Mostrar"}
               </Button>
             </div>
           </CardHeader>
           {showInstructions && (
             <CardContent>
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Estrutura Obrigatória:</h4>
+                  <h4 className="mb-2 font-semibold text-gray-900">Estrutura Obrigatória:</h4>
                   <ul className="space-y-2 text-sm text-gray-700">
                     <li className="flex items-start gap-2">
-                      <Target className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                      <Target className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
                       Texto dissertativo-argumentativo (7 a 30 linhas)
                     </li>
                     <li className="flex items-start gap-2">
-                      <Target className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                      <Target className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
                       Introdução, desenvolvimento e conclusão
                     </li>
                     <li className="flex items-start gap-2">
-                      <Target className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                      <Target className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
                       Proposta de intervenção detalhada
                     </li>
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Critérios de Avaliação:</h4>
+                  <h4 className="mb-2 font-semibold text-gray-900">Critérios de Avaliação:</h4>
                   <ul className="space-y-2 text-sm text-gray-700">
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
                       Domínio da norma padrão (200 pts)
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
                       Compreensão do tema (200 pts)
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
                       Argumentação consistente (200 pts)
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
                       Coesão e coerência (200 pts)
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
                       Proposta de intervenção (200 pts)
                     </li>
                   </ul>
@@ -311,7 +339,7 @@ export default function Redacao() {
         </Card>
 
         {/* Topic Selection */}
-        <Card className="mb-6 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="mb-6 border-0 bg-white/90 shadow-lg backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-yellow-600" />
@@ -320,7 +348,9 @@ export default function Redacao() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Tema Personalizado</label>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Tema Personalizado
+              </label>
               <Input
                 value={customTopic}
                 onChange={(e) => setCustomTopic(e.target.value)}
@@ -329,10 +359,12 @@ export default function Redacao() {
               />
             </div>
 
-            <div className="text-center text-gray-500 text-sm font-medium">ou</div>
+            <div className="text-center text-sm font-medium text-gray-500">ou</div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Temas do ENEM (2009-2023)</label>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Temas do ENEM (2009-2023)
+              </label>
               <Select value={selectedTopic} onValueChange={setSelectedTopic}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um tema do ENEM" />
@@ -348,13 +380,21 @@ export default function Redacao() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Material de Apoio (PDF)</label>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Material de Apoio (PDF)
+              </label>
               <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-red-400 transition-colors"
+                className="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-red-400"
                 onClick={triggerFileUpload}
               >
-                <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" />
-                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Upload className="mx-auto mb-2 h-8 w-8 text-gray-400" />
                 {uploadedFile ? (
                   <div className="flex items-center justify-center gap-2">
                     <FileText className="h-4 w-4 text-green-600" />
@@ -362,8 +402,12 @@ export default function Redacao() {
                   </div>
                 ) : (
                   <>
-                    <p className="text-sm text-gray-600">Arraste um PDF aqui ou clique para selecionar</p>
-                    <p className="text-xs text-gray-500 mt-1">Textos motivadores, coletâneas, etc.</p>
+                    <p className="text-sm text-gray-600">
+                      Arraste um PDF aqui ou clique para selecionar
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500">
+                      Textos motivadores, coletâneas, etc.
+                    </p>
                   </>
                 )}
               </div>
@@ -372,15 +416,17 @@ export default function Redacao() {
         </Card>
 
         {/* Timer */}
-        <Card className="mb-6 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="mb-6 border-0 bg-white/90 shadow-lg backdrop-blur-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-100 rounded-full">
+                <div className="rounded-full bg-blue-100 p-3">
                   <Clock className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <div className="text-3xl font-mono font-bold text-gray-900">{formatTime(timer)}</div>
+                  <div className="font-mono text-3xl font-bold text-gray-900">
+                    {formatTime(timer)}
+                  </div>
                   <p className="text-sm text-gray-600">Tempo recomendado: 90 minutos</p>
                 </div>
               </div>
@@ -390,7 +436,7 @@ export default function Redacao() {
                   size="sm"
                   onClick={handleStartTimer}
                   disabled={isTimerRunning}
-                  className="bg-green-50 hover:bg-green-100 border-green-200"
+                  className="border-green-200 bg-green-50 hover:bg-green-100"
                 >
                   <Play className="h-4 w-4" />
                 </Button>
@@ -399,7 +445,7 @@ export default function Redacao() {
                   size="sm"
                   onClick={handlePauseTimer}
                   disabled={!isTimerRunning}
-                  className="bg-yellow-50 hover:bg-yellow-100 border-yellow-200"
+                  className="border-yellow-200 bg-yellow-50 hover:bg-yellow-100"
                 >
                   <Pause className="h-4 w-4" />
                 </Button>
@@ -407,7 +453,7 @@ export default function Redacao() {
                   variant="outline"
                   size="sm"
                   onClick={handleResetTimer}
-                  className="bg-red-50 hover:bg-red-100 border-red-200"
+                  className="border-red-200 bg-red-50 hover:bg-red-100"
                 >
                   <RotateCcw className="h-4 w-4" />
                 </Button>
@@ -417,7 +463,7 @@ export default function Redacao() {
         </Card>
 
         {/* Writing Area */}
-        <Card className="mb-6 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="mb-6 border-0 bg-white/90 shadow-lg backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
@@ -428,7 +474,9 @@ export default function Redacao() {
                 <Badge variant={wordCount >= 150 && wordCount <= 400 ? "default" : "secondary"}>
                   {wordCount} palavras
                 </Badge>
-                <Badge variant={lineCount >= 7 && lineCount <= 30 ? "default" : "secondary"}>{lineCount} linhas</Badge>
+                <Badge variant={lineCount >= 7 && lineCount <= 30 ? "default" : "secondary"}>
+                  {lineCount} linhas
+                </Badge>
               </div>
             </div>
           </CardHeader>
@@ -437,11 +485,11 @@ export default function Redacao() {
               value={essayText}
               onChange={(e) => setEssayText(e.target.value)}
               placeholder="Digite sua redação aqui... Lembre-se de seguir a estrutura: introdução, desenvolvimento (2-3 parágrafos) e conclusão com proposta de intervenção."
-              className="min-h-[500px] text-base leading-relaxed resize-none"
+              className="min-h-[500px] resize-none text-base leading-relaxed"
               style={{ fontFamily: "Georgia, serif" }}
             />
-            <div className="flex justify-between items-center mt-4 pt-4 border-t">
-              <div className="text-sm text-gray-600 space-y-1">
+            <div className="mt-4 flex items-center justify-between border-t pt-4">
+              <div className="space-y-1 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   {wordCount >= 150 && wordCount <= 400 ? (
                     <CheckCircle className="h-4 w-4 text-green-600" />
@@ -466,12 +514,12 @@ export default function Redacao() {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Avaliando...
                   </>
                 ) : (
                   <>
-                    <Send className="h-4 w-4 mr-2" />
+                    <Send className="mr-2 h-4 w-4" />
                     Enviar para Correção
                   </>
                 )}
@@ -484,22 +532,26 @@ export default function Redacao() {
         {feedback && (
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
+              <div className="rounded-full bg-gradient-to-r from-purple-500 to-blue-500 p-2">
                 <Star className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-serif font-bold text-gray-900">Análise Detalhada por Competência</h3>
+                <h3 className="font-serif text-2xl font-bold text-gray-900">
+                  Análise Detalhada por Competência
+                </h3>
                 <p className="text-gray-600">Avaliação baseada nos critérios oficiais do ENEM</p>
               </div>
             </div>
 
             {/* Overall Score */}
-            <Card className="shadow-xl border-0 bg-gradient-to-r from-blue-50 to-purple-50">
+            <Card className="border-0 bg-gradient-to-r from-blue-50 to-purple-50 shadow-xl">
               <CardContent className="p-6">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{feedback.overall.score}/1000</div>
+                  <div className="mb-2 text-4xl font-bold text-gray-900">
+                    {feedback.overall.score}/1000
+                  </div>
                   <Badge
-                    className="text-lg px-4 py-1 mb-3"
+                    className="mb-3 px-4 py-1 text-lg"
                     variant={
                       feedback.overall.score >= 900
                         ? "default"
@@ -524,23 +576,30 @@ export default function Redacao() {
                 { key: "competencia4", icon: BookOpen },
                 { key: "competencia5", icon: Lightbulb },
               ].map(({ key, icon: Icon }, index) => {
-                const comp = feedback[key as keyof FeedbackData] as { score: number; feedback: string; title: string }
+                const comp = feedback[key as keyof FeedbackData] as {
+                  score: number
+                  feedback: string
+                  title: string
+                }
                 return (
-                  <Card key={key} className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
+                  <Card key={key} className="border-0 bg-white/90 shadow-lg backdrop-blur-sm">
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-gray-100 rounded-lg">
+                          <div className="rounded-lg bg-gray-100 p-2">
                             <Icon className="h-5 w-5 text-gray-700" />
                           </div>
                           <div>
                             <span className="text-lg">Competência {index + 1}</span>
-                            <p className="text-sm text-gray-600 font-normal">{comp.title}</p>
+                            <p className="text-sm font-normal text-gray-600">{comp.title}</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-gray-900">{comp.score}/200</div>
-                          <Badge variant="outline" className={getProgressColor(comp.score).replace("bg-", "text-")}>
+                          <Badge
+                            variant="outline"
+                            className={getProgressColor(comp.score).replace("bg-", "text-")}
+                          >
                             {getScoreLevel(comp.score)}
                           </Badge>
                         </div>
@@ -549,7 +608,7 @@ export default function Redacao() {
                     <CardContent>
                       <div className="space-y-3">
                         <Progress value={(comp.score / 200) * 100} className="h-2" />
-                        <p className="text-gray-700 leading-relaxed">{comp.feedback}</p>
+                        <p className="leading-relaxed text-gray-700">{comp.feedback}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -558,7 +617,7 @@ export default function Redacao() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 justify-center pt-4">
+            <div className="flex justify-center gap-4 pt-4">
               <Button
                 variant="outline"
                 onClick={() => {

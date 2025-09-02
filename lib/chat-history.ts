@@ -1,4 +1,14 @@
-import { collection, doc, addDoc, getDocs, query, orderBy, limit, where, Timestamp } from "firebase/firestore"
+import {
+  collection,
+  doc,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+  where,
+  Timestamp,
+} from "firebase/firestore"
 import { db } from "./firebase"
 
 export interface ChatMessage {
@@ -29,15 +39,15 @@ export const saveChatMessage = async (
 ): Promise<boolean> => {
   try {
     const chatRef = collection(db, "Users", userId, "ChatHistory")
-    
+
     await addDoc(chatRef, {
       text: message,
       sender,
       subject,
       timestamp: Timestamp.now(),
-      createdAt: Timestamp.now()
+      createdAt: Timestamp.now(),
     })
-    
+
     return true
   } catch (error) {
     console.error("Erro ao salvar mensagem do chat:", error)
@@ -59,10 +69,10 @@ export const loadChatHistory = async (
       orderBy("timestamp", "desc"),
       limit(limitMessages * 2) // Buscar mais mensagens para filtrar por subject
     )
-    
+
     const querySnapshot = await getDocs(q)
     const messages: ChatMessage[] = []
-    
+
     querySnapshot.forEach((doc) => {
       const data = doc.data()
       // Filtrar por subject no código
@@ -73,11 +83,11 @@ export const loadChatHistory = async (
           sender: data.sender,
           timestamp: data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.timestamp),
           subject: data.subject,
-          userId
+          userId,
         })
       }
     })
-    
+
     // Limitar ao número solicitado e retornar em ordem cronológica (mais antigas primeiro)
     return messages.slice(0, limitMessages).reverse()
   } catch (error) {
@@ -90,31 +100,33 @@ export const loadChatHistory = async (
 // Carregar todas as conversas de um usuário (resumo)
 export const loadUserConversations = async (
   userId: string
-): Promise<{ subject: string; lastMessage: string; lastTimestamp: Date; messageCount: number }[]> => {
+): Promise<
+  { subject: string; lastMessage: string; lastTimestamp: Date; messageCount: number }[]
+> => {
   try {
     const chatRef = collection(db, "Users", userId, "ChatHistory")
     const q = query(chatRef, orderBy("timestamp", "desc"))
-    
+
     const querySnapshot = await getDocs(q)
     const conversationMap = new Map()
-    
+
     querySnapshot.forEach((doc) => {
       const data = doc.data()
       const subject = data.subject
-      
+
       if (!conversationMap.has(subject)) {
         conversationMap.set(subject, {
           subject,
           lastMessage: data.text,
           lastTimestamp: data.timestamp.toDate(),
-          messageCount: 1
+          messageCount: 1,
         })
       } else {
         const existing = conversationMap.get(subject)
         existing.messageCount++
       }
     })
-    
+
     return Array.from(conversationMap.values())
   } catch (error) {
     console.error("Erro ao carregar conversas do usuário:", error)
@@ -123,17 +135,14 @@ export const loadUserConversations = async (
 }
 
 // Limpar histórico de uma matéria específica
-export const clearSubjectHistory = async (
-  userId: string,
-  subject: string
-): Promise<boolean> => {
+export const clearSubjectHistory = async (userId: string, subject: string): Promise<boolean> => {
   try {
     const chatRef = collection(db, "Users", userId, "ChatHistory")
     const q = query(chatRef, where("subject", "==", subject))
-    
+
     const querySnapshot = await getDocs(q)
-    const deletePromises = querySnapshot.docs.map(doc => doc.ref.delete())
-    
+    const deletePromises = querySnapshot.docs.map((doc) => doc.ref.delete())
+
     await Promise.all(deletePromises)
     return true
   } catch (error) {
@@ -147,28 +156,28 @@ export const getChatStats = async (userId: string) => {
   try {
     const chatRef = collection(db, "Users", userId, "ChatHistory")
     const querySnapshot = await getDocs(chatRef)
-    
+
     const stats = {
       totalMessages: 0,
       messagesBySubject: {} as Record<string, number>,
-      lastActivity: null as Date | null
+      lastActivity: null as Date | null,
     }
-    
+
     let latestTimestamp: Date | null = null
-    
+
     querySnapshot.forEach((doc) => {
       const data = doc.data()
       stats.totalMessages++
-      
+
       const subject = data.subject
       stats.messagesBySubject[subject] = (stats.messagesBySubject[subject] || 0) + 1
-      
+
       const timestamp = data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.timestamp)
       if (!latestTimestamp || timestamp > latestTimestamp) {
         latestTimestamp = timestamp
       }
     })
-    
+
     stats.lastActivity = latestTimestamp
     return stats
   } catch (error) {
@@ -176,7 +185,7 @@ export const getChatStats = async (userId: string) => {
     return {
       totalMessages: 0,
       messagesBySubject: {},
-      lastActivity: null
+      lastActivity: null,
     }
   }
 }

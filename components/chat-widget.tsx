@@ -38,7 +38,7 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
         try {
           const history = await loadChatHistory(user.uid, subject, 20)
           if (history.length > 0) {
-            const historyMessages: Message[] = history.map(msg => ({
+            const historyMessages: Message[] = history.map((msg) => ({
               id: msg.id,
               text: msg.text,
               sender: msg.sender as "user" | "bot",
@@ -56,7 +56,7 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
             setMessages([welcomeMessage])
           }
         } catch (error) {
-          console.error('Erro ao carregar histórico:', error)
+          console.error("Erro ao carregar histórico:", error)
           // Add welcome message on error
           const welcomeMessage: Message = {
             id: "welcome",
@@ -98,12 +98,12 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
     try {
       // Get Firebase auth token
       const token = await user.getIdToken()
-      
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           message: inputMessage,
@@ -140,7 +140,7 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
     return (
       <Button
         onClick={onToggle}
-        className="fixed bottom-24 right-4 z-50 rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 shadow-lg"
+        className="fixed right-4 bottom-24 z-50 h-14 w-14 rounded-full bg-blue-600 shadow-lg hover:bg-blue-700"
       >
         <MessageCircle className="h-6 w-6" />
       </Button>
@@ -148,7 +148,7 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
   }
 
   return (
-    <Card className="fixed bottom-24 right-4 z-50 w-80 h-96 shadow-xl border-0 bg-white/95 backdrop-blur-sm">
+    <Card className="fixed right-4 bottom-24 z-50 h-96 w-80 border-0 bg-white/95 shadow-xl backdrop-blur-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-sm">
@@ -166,11 +166,11 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-col h-full p-3 pt-0">
+      <CardContent className="flex h-full flex-col p-3 pt-0">
         <ScrollArea ref={scrollAreaRef} className="flex-1 pr-3">
           <div className="space-y-3">
             {isLoadingHistory && (
-              <div className="flex gap-2 justify-center">
+              <div className="flex justify-center gap-2">
                 <div className="flex items-center gap-2 text-gray-500">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span className="text-xs">Carregando histórico...</span>
@@ -183,28 +183,32 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
                 className={`flex gap-2 ${message.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`flex items-start gap-2 max-w-[85%] ${
+                  className={`flex max-w-[85%] items-start gap-2 ${
                     message.sender === "user" ? "flex-row-reverse" : "flex-row"
                   }`}
                 >
                   <div
-                    className={`p-1.5 rounded-full flex-shrink-0 ${
+                    className={`flex-shrink-0 rounded-full p-1.5 ${
                       message.sender === "user"
                         ? "bg-blue-600 text-white"
                         : "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
                     }`}
                   >
-                    {message.sender === "user" ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
+                    {message.sender === "user" ? (
+                      <User className="h-3 w-3" />
+                    ) : (
+                      <Bot className="h-3 w-3" />
+                    )}
                   </div>
                   <div
-                    className={`p-2 rounded-lg text-xs ${
+                    className={`rounded-lg p-2 text-xs ${
                       message.sender === "user"
-                        ? "bg-blue-600 text-white rounded-br-sm"
-                        : "bg-gray-100 text-gray-900 rounded-bl-sm"
+                        ? "rounded-br-sm bg-blue-600 text-white"
+                        : "rounded-bl-sm bg-gray-100 text-gray-900"
                     }`}
                   >
                     <p className="leading-relaxed">{message.text}</p>
-                    <span className="text-xs opacity-70 mt-1 block">
+                    <span className="mt-1 block text-xs opacity-70">
                       {message.timestamp.toLocaleTimeString("pt-BR", {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -216,12 +220,12 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
             ))}
 
             {isLoading && (
-              <div className="flex gap-2 justify-start">
+              <div className="flex justify-start gap-2">
                 <div className="flex items-start gap-2">
-                  <div className="p-1.5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+                  <div className="rounded-full bg-gradient-to-r from-purple-500 to-blue-500 p-1.5 text-white">
                     <Bot className="h-3 w-3" />
                   </div>
-                  <div className="bg-gray-100 p-2 rounded-lg rounded-bl-sm">
+                  <div className="rounded-lg rounded-bl-sm bg-gray-100 p-2">
                     <div className="flex items-center gap-2">
                       <Loader2 className="h-3 w-3 animate-spin" />
                       <span className="text-xs text-gray-600">Pensando...</span>
@@ -233,7 +237,7 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
           </div>
         </ScrollArea>
 
-        <div className="mt-3 pt-3 border-t">
+        <div className="mt-3 border-t pt-3">
           <div className="flex gap-2">
             <Input
               value={inputMessage}
@@ -241,15 +245,19 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
               placeholder="Digite sua dúvida..."
               onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
               disabled={isLoading}
-              className="flex-1 text-xs h-8"
+              className="h-8 flex-1 text-xs"
             />
             <Button
               onClick={handleSendMessage}
               disabled={isLoading || !inputMessage.trim()}
               size="sm"
-              className="bg-blue-600 hover:bg-blue-700 h-8 w-8 p-0"
+              className="h-8 w-8 bg-blue-600 p-0 hover:bg-blue-700"
             >
-              {isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+              {isLoading ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Send className="h-3 w-3" />
+              )}
             </Button>
           </div>
         </div>

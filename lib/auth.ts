@@ -29,7 +29,10 @@ export interface UserData {
   provider: string
 }
 
-export const createOrUpdateUserData = async (user: User, additionalData: Partial<UserData> = {}) => {
+export const createOrUpdateUserData = async (
+  user: User,
+  additionalData: Partial<UserData> = {}
+) => {
   try {
     const userRef = doc(db, "Users", user.uid)
     const userDoc = await getDoc(userRef)
@@ -76,7 +79,7 @@ export const createOrUpdateUserData = async (user: User, additionalData: Partial
           photo: user.photoURL || userDoc.data()?.photo,
           email: user.email,
         },
-        { merge: true },
+        { merge: true }
       )
 
       console.log("Usuário existente atualizado")
@@ -89,7 +92,12 @@ export const createOrUpdateUserData = async (user: User, additionalData: Partial
   }
 }
 
-export const signUpWithEmail = async (email: string, password: string, firstName: string, lastName: string) => {
+export const signUpWithEmail = async (
+  email: string,
+  password: string,
+  firstName: string,
+  lastName: string
+) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password)
     const user = userCredential.user

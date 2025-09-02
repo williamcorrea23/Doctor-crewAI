@@ -1,0 +1,52 @@
+[core]
+    autocrlf = false
+    eol = lf
+    editor = code --wait
+
+[push]
+    default = current
+    autoSetupRemote = true
+
+[pull]
+    rebase = true
+
+[branch]
+    autosetupmerge = always
+    autosetuprebase = always
+
+[merge]
+    tool = vscode
+
+[mergetool "vscode"]
+    cmd = code --wait $MERGED
+
+[diff]
+    tool = vscode
+
+[difftool "vscode"]
+    cmd = code --wait --diff $LOCAL $REMOTE
+
+[alias]
+    # Shortcuts for common operations
+    st = status
+    co = checkout
+    br = branch
+    ci = commit
+    ca = commit -a
+    cam = commit -am
+    ps = push
+    pl = pull
+    
+    # Advanced aliases
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    visual = !gitk
+    
+    # Auto-sync alias
+    sync = !git add . && git commit -m "🔄 Auto-sync: $(date)" && git push
+    
+    # Quick commit with message
+    qc = !git add . && git commit -m
+    
+    # Push current branch
+    pc = !git push origin $(git branch --show-current)

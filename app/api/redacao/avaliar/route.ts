@@ -13,7 +13,7 @@ if (!getApps().length) {
     credential: cert({
       projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
     }),
   })
 }
@@ -21,18 +21,18 @@ if (!getApps().length) {
 export async function POST(request: NextRequest) {
   try {
     // Verificar autenticação
-    const authHeader = request.headers.get('authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Token de autenticação necessário' }, { status: 401 })
+    const authHeader = request.headers.get("authorization")
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Token de autenticação necessário" }, { status: 401 })
     }
 
-    const token = authHeader.split('Bearer ')[1]
+    const token = authHeader.split("Bearer ")[1]
     let decodedToken
-    
+
     try {
       decodedToken = await auth().verifyIdToken(token)
     } catch (error) {
-      return NextResponse.json({ error: 'Token inválido' }, { status: 401 })
+      return NextResponse.json({ error: "Token inválido" }, { status: 401 })
     }
 
     const userId = decodedToken.uid
@@ -103,60 +103,71 @@ Para cada competência, forneça:
         messages: [{ role: "user", content: evaluator2Prompt }],
         max_tokens: 1500,
         temperature: 0.1,
-      })
+      }),
     ])
 
     const evaluation1Text = evaluation1.choices[0]?.message?.content || "Erro na avaliação técnica"
-    const evaluation2Text = evaluation2.choices[0]?.message?.content || "Erro na avaliação de conteúdo"
+    const evaluation2Text =
+      evaluation2.choices[0]?.message?.content || "Erro na avaliação de conteúdo"
 
     // Processar resultados da dupla avaliação
     const feedback = {
       competencia1: {
         score: extractScore(evaluation1Text, "COMPETÊNCIA 1") || 160,
-        feedback: extractFeedback(evaluation1Text, "COMPETÊNCIA 1") || "Avaliação técnica da escrita formal.",
+        feedback:
+          extractFeedback(evaluation1Text, "COMPETÊNCIA 1") ||
+          "Avaliação técnica da escrita formal.",
         title: "Domínio da modalidade escrita formal",
-        evaluator: "Avaliador 1 - Técnico"
+        evaluator: "Avaliador 1 - Técnico",
       },
       competencia2: {
         score: extractScore(evaluation2Text, "COMPETÊNCIA 2") || 140,
-        feedback: extractFeedback(evaluation2Text, "COMPETÊNCIA 2") || "Avaliação do conteúdo e repertório.",
+        feedback:
+          extractFeedback(evaluation2Text, "COMPETÊNCIA 2") ||
+          "Avaliação do conteúdo e repertório.",
         title: "Compreender a proposta de redação",
-        evaluator: "Avaliador 2 - Conteúdo"
+        evaluator: "Avaliador 2 - Conteúdo",
       },
       competencia3: {
         score: extractScore(evaluation1Text, "COMPETÊNCIA 3") || 120,
-        feedback: extractFeedback(evaluation1Text, "COMPETÊNCIA 3") || "Avaliação da organização textual.",
+        feedback:
+          extractFeedback(evaluation1Text, "COMPETÊNCIA 3") || "Avaliação da organização textual.",
         title: "Selecionar e organizar informações",
-        evaluator: "Avaliador 1 - Técnico"
+        evaluator: "Avaliador 1 - Técnico",
       },
       competencia4: {
         score: extractScore(evaluation1Text, "COMPETÊNCIA 4") || 140,
-        feedback: extractFeedback(evaluation1Text, "COMPETÊNCIA 4") || "Avaliação dos mecanismos linguísticos.",
+        feedback:
+          extractFeedback(evaluation1Text, "COMPETÊNCIA 4") ||
+          "Avaliação dos mecanismos linguísticos.",
         title: "Conhecimento dos mecanismos linguísticos",
-        evaluator: "Avaliador 1 - Técnico"
+        evaluator: "Avaliador 1 - Técnico",
       },
       competencia5: {
         score: extractScore(evaluation2Text, "COMPETÊNCIA 5") || 120,
-        feedback: extractFeedback(evaluation2Text, "COMPETÊNCIA 5") || "Avaliação da proposta de intervenção.",
+        feedback:
+          extractFeedback(evaluation2Text, "COMPETÊNCIA 5") ||
+          "Avaliação da proposta de intervenção.",
         title: "Elaborar proposta de intervenção",
-        evaluator: "Avaliador 2 - Conteúdo"
+        evaluator: "Avaliador 2 - Conteúdo",
       },
       overall: {
         score: 0,
-        feedback: "Sua redação foi avaliada por dois especialistas independentes para maior precisão.",
+        feedback:
+          "Sua redação foi avaliada por dois especialistas independentes para maior precisão.",
         level: "Bom",
       },
       evaluations: {
         technical: {
           evaluator: "Avaliador 1 - Especialista Técnico",
           focus: "Competências 1, 3 e 4 (aspectos técnicos e estruturais)",
-          fullText: evaluation1Text
+          fullText: evaluation1Text,
         },
         content: {
           evaluator: "Avaliador 2 - Especialista em Conteúdo",
           focus: "Competências 2 e 5 (conteúdo e proposta de intervenção)",
-          fullText: evaluation2Text
-        }
+          fullText: evaluation2Text,
+        },
       },
       metadata: {
         wordCount,
@@ -164,7 +175,7 @@ Para cada competência, forneça:
         timeSpent,
         evaluatedAt: new Date().toISOString(),
         userId,
-        evaluationMethod: "Dupla Avaliação Especializada"
+        evaluationMethod: "Dupla Avaliação Especializada",
       },
     }
 

@@ -17,7 +17,7 @@ interface PerformanceChartProps {
 }
 
 export function PerformanceChart({ userId }: PerformanceChartProps) {
-  const { } = useAuth()
+  const {} = useAuth()
   const [data, setData] = useState<PerformanceData[]>([
     { subject: "Matemática", correct: 0, incorrect: 0, color: "bg-amber-500" },
     { subject: "Linguagens", correct: 0, incorrect: 0, color: "bg-violet-500" },
@@ -88,7 +88,7 @@ export function PerformanceChart({ userId }: PerformanceChartProps) {
                 incorrect: Math.floor(Math.random() * 20) + 5,
               }
             }
-          }),
+          })
         )
 
         setData(updatedData)
@@ -118,8 +118,8 @@ export function PerformanceChart({ userId }: PerformanceChartProps) {
       <div className="space-y-4">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded mb-2"></div>
-            <div className="h-6 bg-gray-200 rounded"></div>
+            <div className="mb-2 h-4 rounded bg-gray-200"></div>
+            <div className="h-6 rounded bg-gray-200"></div>
           </div>
         ))}
       </div>
@@ -137,13 +137,13 @@ export function PerformanceChart({ userId }: PerformanceChartProps) {
 
         return (
           <div key={index} className="space-y-2">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700">{item.subject}</span>
               <span className="text-sm text-gray-500">
                 {item.correct}/{total}
               </span>
             </div>
-            <div className="relative h-6 bg-gray-100 rounded-full overflow-hidden">
+            <div className="relative h-6 overflow-hidden rounded-full bg-gray-100">
               <div
                 className={`h-full ${item.color} transition-all duration-500 ease-out`}
                 style={{ width: `${barWidth}%` }}
