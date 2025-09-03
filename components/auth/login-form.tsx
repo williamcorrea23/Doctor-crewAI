@@ -1,60 +1,74 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { signInWithEmail, signInWithGoogle, resetPassword } from "@/lib/auth"
-import { useAuth } from "@/components/auth-provider"
+import { useAuth } from "@/hooks/use-auth"
+import { useForm } from "@/hooks/use-form"
+import { useUIState } from "@/hooks/use-ui-state"
+import { useLoading } from "@/hooks/use-loading"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, Eye, EyeOff, TestTube } from "lucide-react"
+import { z } from "zod"
+
+const loginSchema = z.object({
+  email: z.string().email('Email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+})
+
+type LoginFormData = z.infer<typeof loginSchema>
 
 export function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState("")
-  const [messageType, setMessageType] = useState<"success" | "error" | "info">("info")
   const router = useRouter()
   const { loginAsMock } = useAuth()
+  const { isLoading, withLoading } = useLoading()
+  const { state: uiState, updateState, toggleState } = useUIState({
+    showPassword: false,
+    message: '',
+    messageType: 'info' as 'success' | 'error' | 'info',
+  })
+  
+  const form = useForm<LoginFormData>({
+    initialValues: { email: '', password: '' },
+    validationSchema: loginSchema,
+  })
 
   const showMessage = (msg: string, type: "success" | "error" | "info") => {
-    setMessage(msg)
-    setMessageType(type)
-    setTimeout(() => setMessage(""), 5000)
+    updateState('message', msg)
+    updateState('messageType', type)
+    setTimeout(() => updateState('message', ''), 5000)
   }
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    
+    if (!form.validateForm()) return
 
-    const result = await signInWithEmail(email, password)
+    await withLoading(async () => {
+      const result = await signInWithEmail(form.values.email, form.values.password)
 
-    if (result.success) {
-      showMessage("Login realizado com sucesso!", "success")
-      setTimeout(() => router.push("/"), 1500)
-    } else {
-      showMessage(result.error || "Erro no login", "error")
-    }
-
-    setLoading(false)
+      if (result.success) {
+        showMessage("Login realizado com sucesso!", "success")
+        setTimeout(() => router.push("/"), 1500)
+      } else {
+        showMessage(result.error || "Erro no login", "error")
+      }
+    })
   }
 
   const handleGoogleLogin = async () => {
-    setLoading(true)
+    await withLoading(async () => {
+      const result = await signInWithGoogle()
 
-    const result = await signInWithGoogle()
-
-    if (result.success) {
-      showMessage("Login com Google realizado com sucesso!", "success")
-      setTimeout(() => router.push("/"), 1500)
-    } else {
-      showMessage(result.error || "Erro no login com Google", "error")
-    }
-
-    setLoading(false)
+      if (result.success) {
+        showMessage("Login com Google realizado com sucesso!", "success")
+        setTimeout(() => router.push("/"), 1500)
+      } else {
+        showMessage(result.error || "Erro no login com Google", "error")
+      }
+    })
   }
 
   const handleMockLogin = () => {
@@ -65,12 +79,12 @@ export function LoginForm() {
   }
 
   const handleResetPassword = async () => {
-    if (!email) {
+    if (!form.values.email) {
       showMessage("Por favor, insira seu email", "error")
       return
     }
 
-    const result = await resetPassword(email)
+    const result = await resetPassword(form.values.email)
 
     if (result.success) {
       showMessage("Email de redefinição enviado! Verifique sua caixa de entrada.", "success")
@@ -88,17 +102,17 @@ export function LoginForm() {
         <CardDescription>Acesse sua conta para continuar estudando</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {message && (
+        {uiState.message && (
           <div
             className={`rounded-lg p-3 text-sm ${
-              messageType === "success"
+              uiState.messageType === "success"
                 ? "border border-green-200 bg-green-100 text-green-700"
-                : messageType === "error"
+                : uiState.messageType === "error"
                   ? "border border-red-200 bg-red-100 text-red-700"
                   : "border border-blue-200 bg-blue-100 text-blue-700"
             }`}
           >
-            {message}
+            {uiState.message}
           </div>
         )}
 
@@ -109,7 +123,7 @@ export function LoginForm() {
             variant="outline"
             className="w-full border-yellow-300 bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
             onClick={handleMockLogin}
-            disabled={loading}
+            disabled={isLoading}
           >
             <TestTube className="mr-2 h-4 w-4" />
             Entrar como Usuário de Teste
@@ -131,8 +145,7 @@ export function LoginForm() {
             <Input
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...form.getFieldProps('email')}
               className="pl-10"
               required
             />
@@ -141,24 +154,23 @@ export function LoginForm() {
           <div className="relative">
             <Lock className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
             <Input
-              type={showPassword ? "text" : "password"}
+              type={uiState.showPassword ? "text" : "password"}
               placeholder="Senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...form.getFieldProps('password')}
               className="pr-10 pl-10"
               required
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={() => toggleState('showPassword')}
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {uiState.showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
 
@@ -167,7 +179,7 @@ export function LoginForm() {
           variant="outline"
           className="w-full bg-transparent"
           onClick={handleGoogleLogin}
-          disabled={loading}
+          disabled={isLoading}
         >
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
             <path

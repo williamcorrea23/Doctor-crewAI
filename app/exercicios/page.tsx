@@ -34,7 +34,8 @@ import {
   Award,
 } from "lucide-react"
 import { BottomNavigation } from "@/components/bottom-navigation"
-import { useAuth } from "@/components/auth-provider"
+import { useAuth } from "@/hooks/use-auth"
+import { getCurrentUserToken } from "@/lib/auth"
 
 const subjects = [
   {
@@ -157,26 +158,91 @@ export default function Exercicios() {
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
-  const startExercise = (subject: string, mode: "practice" | "simulation") => {
-    const filteredQuestions = mockQuestions.filter((q) => q.subject === subject)
-    const questionCount = mode === "simulation" ? Math.min(filteredQuestions.length, 10) : 5
+  const startExercise = async (subject: string, mode: "practice" | "simulation") => {
+    try {
+      const questionCount = mode === "simulation" ? 10 : 5
+      
+      const token = await getCurrentUserToken()
+       
+       if (!token) {
+         throw new Error('Token de autenticação não disponível')
+       }
+       
+       const response = await fetch('/api/exercicios', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': `Bearer ${token}`,
+         },
+        body: JSON.stringify({
+          materia: subject,
+          quantidade: questionCount,
+          dificuldade: mode === "simulation" ? "mista" : "facil"
+        })
+      })
 
-    const newSession: ExerciseSession = {
-      questions: filteredQuestions.slice(0, questionCount),
-      currentIndex: 0,
-      answers: {},
-      startTime: new Date(),
-      timeSpent: 0,
-      isCompleted: false,
+      if (!response.ok) {
+        throw new Error('Erro ao carregar exercícios')
+      }
+
+      const data = await response.json()
+      
+      const newSession: ExerciseSession = {
+        questions: data.exercicios || [],
+        currentIndex: 0,
+        answers: {},
+        startTime: new Date(),
+        timeSpent: 0,
+        isCompleted: false,
+      }
+
+      setSession(newSession)
+      setSelectedSubject(subject)
+      setExerciseMode(mode)
+      setSelectedAnswer("")
+      setShowResult(false)
+      setTimer(0)
+      setIsTimerRunning(mode === "simulation")
+    } catch (error) {
+      console.error('Erro ao iniciar exercício:', error)
+      
+      let errorMessage = "Erro ao gerar exercícios. Tente novamente."
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Token de autenticação')) {
+          errorMessage = "Sessão expirada. Por favor, faça login novamente."
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMessage = "Erro de conexão. Verifique sua internet e tente novamente."
+        } else if (error.message.includes('401')) {
+          errorMessage = "Acesso não autorizado. Faça login novamente."
+        } else if (error.message.includes('500')) {
+          errorMessage = "Erro interno do servidor. Tente novamente em alguns minutos."
+        }
+      }
+      
+
+      
+      // Fallback para dados mock em caso de erro
+      const filteredQuestions = mockQuestions.filter((q) => q.subject === subject)
+      const questionCount = mode === "simulation" ? Math.min(filteredQuestions.length, 10) : 5
+
+      const newSession: ExerciseSession = {
+        questions: filteredQuestions.slice(0, questionCount),
+        currentIndex: 0,
+        answers: {},
+        startTime: new Date(),
+        timeSpent: 0,
+        isCompleted: false,
+      }
+
+      setSession(newSession)
+      setSelectedSubject(subject)
+      setExerciseMode(mode)
+      setSelectedAnswer("")
+      setShowResult(false)
+      setTimer(0)
+      setIsTimerRunning(mode === "simulation")
     }
-
-    setSession(newSession)
-    setSelectedSubject(subject)
-    setExerciseMode(mode)
-    setSelectedAnswer("")
-    setShowResult(false)
-    setTimer(0)
-    setIsTimerRunning(mode === "simulation")
   }
 
   const handleAnswerSelect = (answerId: string) => {

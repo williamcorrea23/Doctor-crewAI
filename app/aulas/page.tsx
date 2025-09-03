@@ -22,8 +22,9 @@ import {
   Heart,
 } from "lucide-react"
 import { BottomNavigation } from "@/components/bottom-navigation"
-import { useAuth } from "@/components/auth-provider"
+import { useAuth } from "@/hooks/use-auth"
 import { loadChatHistory } from "@/lib/chat-history"
+import { getCurrentUserToken } from "@/lib/auth"
 
 const subjects = [
   {
@@ -381,7 +382,15 @@ export default function Aulas() {
   }
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isLoading || !user) return
+    console.log('🔍 DEBUG - handleSendMessage iniciado')
+    console.log('🔍 DEBUG - user:', !!user, user?.uid)
+    console.log('🔍 DEBUG - inputMessage:', inputMessage.trim())
+    console.log('🔍 DEBUG - isLoading:', isLoading)
+    
+    if (!inputMessage.trim() || isLoading || !user) {
+      console.log('🔍 DEBUG - Condição de saída atingida')
+      return
+    }
 
     const userMessage: Message = {
       id: Date.now(),
@@ -399,8 +408,14 @@ export default function Aulas() {
       const subject = subjects.find((s) => s.id === selectedSubject)
       const topic = subject?.topics.find((t) => t.id === selectedTopic)
 
-      // Obter token de autenticação
-      const token = await user.getIdToken()
+      console.log('🔍 DEBUG - Obtendo token...')
+      // Obter token de autenticação do Firebase
+      const token = await getCurrentUserToken()
+      console.log('🔍 DEBUG - Token obtido:', !!token, token?.substring(0, 20) + '...')
+      
+      if (!token) {
+        throw new Error('Token de autenticação não disponível')
+      }
 
       const response = await fetch("/api/aulas", {
         method: "POST",
@@ -428,6 +443,21 @@ export default function Aulas() {
       }
     } catch (error) {
       console.error("Erro ao enviar mensagem:", error)
+      
+      let errorMessage = "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente."
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Token de autenticação')) {
+          errorMessage = "Sessão expirada. Por favor, faça login novamente."
+        } else if (error.message.includes('fetch')) {
+          errorMessage = "Erro de conexão. Verifique sua internet e tente novamente."
+        } else if (error.message.includes('401')) {
+          errorMessage = "Acesso não autorizado. Faça login novamente."
+        } else if (error.message.includes('500')) {
+          errorMessage = "Erro interno do servidor. Tente novamente em alguns minutos."
+        }
+      }
+      
       const subject = subjects.find((s) => s.id === selectedSubject)
       const topic = subject?.topics.find((t) => t.id === selectedTopic)
 
@@ -440,7 +470,7 @@ export default function Aulas() {
 
       const botMessage: Message = {
         id: Date.now() + 1,
-        text: fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)],
+        text: errorMessage,
         sender: "bot",
         timestamp: new Date(),
       }

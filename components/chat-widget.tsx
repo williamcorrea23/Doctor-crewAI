@@ -6,15 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Loader2, MessageCircle, Send, Bot, User, X, Minimize2 } from "lucide-react"
-import { useAuth } from "@/components/auth-provider"
-import { loadChatHistory } from "@/lib/chat-history"
-
-interface Message {
-  id: string
-  text: string
-  sender: "user" | "bot"
-  timestamp: Date
-}
+import { useAuth } from "@/hooks/use-auth"
+import { useChatHistory } from "@/hooks/use-chat-history"
+import { useLoading } from "@/hooks/use-loading"
+import { getCurrentUserToken } from "@/lib/auth"
 
 interface ChatWidgetProps {
   subject: string
@@ -24,55 +19,22 @@ interface ChatWidgetProps {
 }
 
 export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidgetProps) {
-  const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const { user } = useAuth()
+  const { messages, isLoading: isLoadingHistory, addMessage } = useChatHistory(subject)
+  const { isLoading, withLoading } = useLoading()
 
   useEffect(() => {
-    const loadHistory = async () => {
-      if (isOpen && user && messages.length === 0) {
-        setIsLoadingHistory(true)
-        try {
-          const history = await loadChatHistory(user.uid, subject, 20)
-          if (history.length > 0) {
-            const historyMessages: Message[] = history.map((msg) => ({
-              id: msg.id,
-              text: msg.text,
-              sender: msg.sender as "user" | "bot",
-              timestamp: msg.timestamp.toDate(),
-            }))
-            setMessages(historyMessages)
-          } else {
-            // Add welcome message if no history
-            const welcomeMessage: Message = {
-              id: "welcome",
-              text: `Olá! Sou seu assistente especializado em ${subjectName}. Como posso ajudar você hoje?`,
-              sender: "bot",
-              timestamp: new Date(),
-            }
-            setMessages([welcomeMessage])
-          }
-        } catch (error) {
-          console.error("Erro ao carregar histórico:", error)
-          // Add welcome message on error
-          const welcomeMessage: Message = {
-            id: "welcome",
-            text: `Olá! Sou seu assistente especializado em ${subjectName}. Como posso ajudar você hoje?`,
-            sender: "bot",
-            timestamp: new Date(),
-          }
-          setMessages([welcomeMessage])
-        } finally {
-          setIsLoadingHistory(false)
-        }
+    // Add welcome message if no history loaded
+    if (isOpen && messages.length === 0 && !isLoadingHistory) {
+      const welcomeMessage = {
+        text: `Olá! Sou seu assistente especializado em ${subjectName}. Como posso ajudar você hoje?`,
+        sender: "bot" as const,
       }
+      addMessage(welcomeMessage)
     }
-
-    loadHistory()
-  }, [isOpen, user, subject, subjectName, messages.length])
+  }, [isOpen, messages.length, isLoadingHistory, subjectName, addMessage])
 
   useEffect(() => {
     // Scroll to bottom when new messages are added
@@ -84,56 +46,69 @@ export function ChatWidget({ subject, subjectName, isOpen, onToggle }: ChatWidge
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading || !user) return
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
+    const userMessage = {
       text: inputMessage,
-      sender: "user",
-      timestamp: new Date(),
+      sender: "user" as const,
     }
 
-    setMessages((prev) => [...prev, userMessage])
+    addMessage(userMessage)
+    const currentMessage = inputMessage
     setInputMessage("")
-    setIsLoading(true)
 
-    try {
-      // Get Firebase auth token
-      const token = await user.getIdToken()
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          message: inputMessage,
-          subject,
-        }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        const botMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: data.response,
-          sender: "bot",
-          timestamp: new Date(),
+    await withLoading(async () => {
+      try {
+        const token = await getCurrentUserToken()
+        
+        if (!token) {
+          throw new Error('Token de autenticação não disponível')
         }
-        setMessages((prev) => [...prev, botMessage])
-      } else {
-        throw new Error("Falha na comunicação")
+
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            message: currentMessage,
+            subject,
+          }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          const botMessage = {
+            text: data.response,
+            sender: "bot" as const,
+          }
+          addMessage(botMessage)
+        } else {
+          throw new Error("Falha na comunicação")
+        }
+      } catch (error) {
+        console.error("Erro no chat:", error)
+        
+        let errorMessage = "Desculpe, houve um problema. Tente novamente em alguns instantes."
+        
+        if (error instanceof Error) {
+          if (error.message.includes('Token de autenticação')) {
+            errorMessage = "Sessão expirada. Por favor, faça login novamente."
+          } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            errorMessage = "Erro de conexão. Verifique sua internet e tente novamente."
+          } else if (error.message.includes('401')) {
+            errorMessage = "Acesso não autorizado. Faça login novamente."
+          } else if (error.message.includes('500')) {
+            errorMessage = "Erro interno do servidor. Tente novamente em alguns minutos."
+          }
+        }
+        
+        const botErrorMessage = {
+          text: errorMessage,
+          sender: "bot" as const,
+        }
+        addMessage(botErrorMessage)
       }
-    } catch (error) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "Desculpe, houve um problema. Tente novamente em alguns instantes.",
-        sender: "bot",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
+    })
   }
 
   if (!isOpen) {

@@ -1,26 +1,24 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useEffect, useState } from "react"
 import type { User } from "firebase/auth"
 import { onAuthStateChange } from "@/lib/auth"
 import { useRouter, usePathname } from "next/navigation"
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null
   loading: boolean
   logout: () => void
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  logout: () => {},
-})
+export const AuthContext = createContext<AuthContextType | null>(null)
 
-export const useAuth = () => useContext(AuthContext)
+interface AuthProviderProps {
+  children: React.ReactNode
+}
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -48,5 +46,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe()
   }, [router, pathname])
 
-  return <AuthContext.Provider value={{ user, loading, logout }}>{children}</AuthContext.Provider>
+  const contextValue: AuthContextType = {
+    user,
+    loading,
+    logout,
+  }
+
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {children}
+    </AuthContext.Provider>
+  )
 }

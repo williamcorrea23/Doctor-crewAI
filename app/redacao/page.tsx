@@ -37,7 +37,8 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { BottomNavigation } from "@/components/bottom-navigation"
-import { useAuth } from "@/components/auth-provider"
+import { useAuth } from "@/hooks/use-auth"
+import { getCurrentUserToken } from "@/lib/auth"
 
 const enemTopics = [
   { value: "2023", label: "2023 - O desafio de aumentar a doação de órgãos no Brasil" },
@@ -93,6 +94,7 @@ export default function Redacao() {
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackData | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -156,10 +158,17 @@ export default function Redacao() {
         enemTopics.find((t) => t.value === selectedTopic)?.label ||
         "Tema não especificado"
 
+      const token = await getCurrentUserToken()
+      
+      if (!token) {
+        throw new Error('Token de autenticação não disponível')
+      }
+      
       const response = await fetch("/api/redacao/avaliar", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
           texto: essayText,
@@ -178,6 +187,24 @@ export default function Redacao() {
         throw new Error("Falha na avaliação")
       }
     } catch (error) {
+      console.error("Erro ao avaliar redação:", error)
+      
+      let errorMessage = "Erro ao avaliar redação. Tente novamente."
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Token de autenticação')) {
+          errorMessage = "Sessão expirada. Por favor, faça login novamente."
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMessage = "Erro de conexão. Verifique sua internet e tente novamente."
+        } else if (error.message.includes('401')) {
+          errorMessage = "Acesso não autorizado. Faça login novamente."
+        } else if (error.message.includes('500')) {
+          errorMessage = "Erro interno do servidor. Tente novamente em alguns minutos."
+        }
+      }
+      
+      setError(errorMessage)
+      
       const mockFeedback: FeedbackData = {
         competencia1: {
           score: Math.floor(Math.random() * 40) + 160, // 160-200
@@ -483,7 +510,10 @@ export default function Redacao() {
           <CardContent>
             <Textarea
               value={essayText}
-              onChange={(e) => setEssayText(e.target.value)}
+              onChange={(e) => {
+                setEssayText(e.target.value)
+                if (error) setError(null)
+              }}
               placeholder="Digite sua redação aqui... Lembre-se de seguir a estrutura: introdução, desenvolvimento (2-3 parágrafos) e conclusão com proposta de intervenção."
               className="min-h-[500px] resize-none text-base leading-relaxed"
               style={{ fontFamily: "Georgia, serif" }}
@@ -507,23 +537,31 @@ export default function Redacao() {
                   <span>Linhas: {lineCount} (obrigatório: 7-30)</span>
                 </div>
               </div>
-              <Button
-                onClick={handleSubmitEssay}
-                className="bg-red-600 hover:bg-red-700"
-                disabled={wordCount < 50 || isSubmitting || lineCount < 7}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Avaliando...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" />
-                    Enviar para Correção
-                  </>
+              <div className="flex flex-col items-end gap-2">
+                <Button
+                  onClick={handleSubmitEssay}
+                  className="bg-red-600 hover:bg-red-700"
+                  disabled={wordCount < 50 || isSubmitting || lineCount < 7}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Avaliando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Enviar para Correção
+                    </>
+                  )}
+                </Button>
+                {error && (
+                  <div className="flex items-center gap-2 text-sm text-red-600">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{error}</span>
+                  </div>
                 )}
-              </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

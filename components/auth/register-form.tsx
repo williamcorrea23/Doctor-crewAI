@@ -1,61 +1,76 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { signUpWithEmail, signInWithGoogle } from "@/lib/auth"
+import { useForm } from "@/hooks/use-form"
+import { useUIState } from "@/hooks/use-ui-state"
+import { useLoading } from "@/hooks/use-loading"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react"
+import { z } from "zod"
+
+const registerSchema = z.object({
+  firstName: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+  lastName: z.string().min(2, 'Sobrenome deve ter pelo menos 2 caracteres'),
+  email: z.string().email('Email inválido'),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
+})
+
+type RegisterFormData = z.infer<typeof registerSchema>
 
 export function RegisterForm() {
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState("")
-  const [messageType, setMessageType] = useState<"success" | "error" | "info">("info")
   const router = useRouter()
+  const { isLoading, withLoading } = useLoading()
+  const { state: uiState, updateState, toggleState } = useUIState({
+    showPassword: false,
+    message: '',
+    messageType: 'info' as 'success' | 'error' | 'info',
+  })
+  
+  const form = useForm<RegisterFormData>({
+    initialValues: { firstName: '', lastName: '', email: '', password: '' },
+    validationSchema: registerSchema,
+  })
 
   const showMessage = (msg: string, type: "success" | "error" | "info") => {
-    setMessage(msg)
-    setMessageType(type)
-    setTimeout(() => setMessage(""), 5000)
+    updateState({ message: msg, messageType: type })
+    setTimeout(() => updateState({ message: '' }), 5000)
   }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-
-    const result = await signUpWithEmail(email, password, firstName, lastName)
-
-    if (result.success) {
-      showMessage("Conta criada com sucesso!", "success")
-      setTimeout(() => router.push("/"), 1500)
-    } else {
-      showMessage(result.error || "Erro ao criar conta", "error")
+    
+    if (!form.validate()) {
+      return
     }
 
-    setLoading(false)
+    await withLoading(async () => {
+      const { firstName, lastName, email, password } = form.values
+      const result = await signUpWithEmail(email, password, firstName, lastName)
+
+      if (result.success) {
+        showMessage("Conta criada com sucesso!", "success")
+        setTimeout(() => router.push("/"), 1500)
+      } else {
+        showMessage(result.error || "Erro ao criar conta", "error")
+      }
+    })
   }
 
   const handleGoogleRegister = async () => {
-    setLoading(true)
+    await withLoading(async () => {
+      const result = await signInWithGoogle()
 
-    const result = await signInWithGoogle()
-
-    if (result.success) {
-      showMessage("Conta criada com Google!", "success")
-      setTimeout(() => router.push("/"), 1500)
-    } else {
-      showMessage(result.error || "Erro ao criar conta com Google", "error")
-    }
-
-    setLoading(false)
+      if (result.success) {
+        showMessage("Conta criada com Google!", "success")
+        setTimeout(() => router.push("/"), 1500)
+      } else {
+        showMessage(result.error || "Erro ao criar conta com Google", "error")
+      }
+    })
   }
 
   return (
@@ -67,17 +82,17 @@ export function RegisterForm() {
         <CardDescription>Crie sua conta para começar a estudar</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {message && (
+        {uiState.message && (
           <div
             className={`rounded-lg p-3 text-sm ${
-              messageType === "success"
+              uiState.messageType === "success"
                 ? "border border-green-200 bg-green-100 text-green-700"
-                : messageType === "error"
+                : uiState.messageType === "error"
                   ? "border border-red-200 bg-red-100 text-red-700"
                   : "border border-blue-200 bg-blue-100 text-blue-700"
             }`}
           >
-            {message}
+            {uiState.message}
           </div>
         )}
 
@@ -88,8 +103,7 @@ export function RegisterForm() {
               <Input
                 type="text"
                 placeholder="Nome"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                {...form.getFieldProps('firstName')}
                 className="pl-10"
                 required
               />
@@ -99,8 +113,7 @@ export function RegisterForm() {
               <Input
                 type="text"
                 placeholder="Sobrenome"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                {...form.getFieldProps('lastName')}
                 className="pl-10"
                 required
               />
@@ -112,8 +125,7 @@ export function RegisterForm() {
             <Input
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...form.getFieldProps('email')}
               className="pl-10"
               required
             />
@@ -122,25 +134,24 @@ export function RegisterForm() {
           <div className="relative">
             <Lock className="absolute top-3 left-3 h-4 w-4 text-gray-400" />
             <Input
-              type={showPassword ? "text" : "password"}
+              type={uiState.showPassword ? "text" : "password"}
               placeholder="Senha (mín. 6 caracteres)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...form.getFieldProps('password')}
               className="pr-10 pl-10"
               minLength={6}
               required
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={() => toggleState('showPassword')}
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {uiState.showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Criando conta..." : "Criar Conta"}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Criando conta..." : "Criar Conta"}
           </Button>
         </form>
 
@@ -158,7 +169,7 @@ export function RegisterForm() {
           variant="outline"
           className="w-full bg-transparent"
           onClick={handleGoogleRegister}
-          disabled={loading}
+          disabled={isLoading}
         >
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
             <path

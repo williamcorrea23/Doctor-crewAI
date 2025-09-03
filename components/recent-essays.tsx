@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Eye, ChevronDown, ChevronUp } from "lucide-react"
 import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import { useAuth } from "@/components/auth-provider"
+import { useAuth } from "@/hooks/use-auth"
 
 interface Essay {
   id: number

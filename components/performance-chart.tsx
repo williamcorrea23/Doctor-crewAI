@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import { useAuth } from "@/components/auth-provider"
+import { useAuth } from "@/hooks/use-auth"
 
 interface PerformanceData {
   subject: string
@@ -100,7 +100,7 @@ export function PerformanceChart({ userId }: PerformanceChartProps) {
     }
 
     fetchPerformanceData()
-  }, [userId])
+  }, [userId, data])
 
   // Função auxiliar para verificar se uma resposta é correta
   const isCorrect = (value: any): boolean => {

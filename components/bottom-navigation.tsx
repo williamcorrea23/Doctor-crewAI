@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Home, BookOpen, ClipboardList, PenTool, Info, LogOut } from "lucide-react"
-import { useAuth } from "@/components/auth-provider"
+import { useAuth } from "@/hooks/use-auth"
 
 interface BottomNavigationProps {
   currentPage?: string

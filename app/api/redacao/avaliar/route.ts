@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import OpenAI from "openai"
-import { auth } from "firebase-admin/auth"
 import { initializeApp, getApps, cert } from "firebase-admin/app"
+import { getAuth } from "firebase-admin/auth"
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
     let decodedToken
 
     try {
-      decodedToken = await auth().verifyIdToken(token)
+      const auth = getAuth()
+      decodedToken = await auth.verifyIdToken(token)
     } catch (error) {
       return NextResponse.json({ error: "Token inválido" }, { status: 401 })
     }
@@ -90,19 +91,25 @@ Para cada competência, forneça:
 - Avaliação da proposta de intervenção
 - Sugestões de melhoria no conteúdo`
 
-    // Executar ambas as avaliações em paralelo
+    // Executar ambas as avaliações em paralelo com GPT-5-Nano-2025-08-07
     const [evaluation1, evaluation2] = await Promise.all([
       openai.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-5-nano-2025-08-07",
         messages: [{ role: "user", content: evaluator1Prompt }],
-        max_tokens: 1500,
+        max_tokens: 2000,
         temperature: 0.1,
+        top_p: 0.95,
+        presence_penalty: 0.0,
+        frequency_penalty: 0.0,
       }),
       openai.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-5-nano-2025-08-07",
         messages: [{ role: "user", content: evaluator2Prompt }],
-        max_tokens: 1500,
+        max_tokens: 2000,
         temperature: 0.1,
+        top_p: 0.95,
+        presence_penalty: 0.0,
+        frequency_penalty: 0.0,
       }),
     ])
 

@@ -198,3 +198,16 @@ export const logout = async () => {
 export const onAuthStateChange = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback)
 }
+
+export const getCurrentUserToken = async (): Promise<string | null> => {
+  try {
+    const user = auth.currentUser
+    if (user) {
+      return await user.getIdToken()
+    }
+    return null
+  } catch (error) {
+    console.error('Erro ao obter token:', error)
+    return null
+  }
+}
